@@ -14,31 +14,25 @@ int main()
     srand(time(0));
 
     // some config variables
-    const int window_width = 640;
-    const int window_height = 640;
-    const unsigned int particles_count = 6400;
-    const bool show_particles = true;
-    const bool show_flowfield = false;
-    const sf::Color background_color = sf::Color::White;
-    const sf::Color flowfield_color = sf::Color(0, 0, 0, 100);
-    const sf::Color particles_color = sf::Color(0, 0, 0, show_flowfield ? 255 : 2);
+    const int windowWidth = 640;
+    const int windowHeight = 640;
+    const unsigned int particlesCount = 6400;
+    const bool showParticles = true;
+    const bool showFlowfield = false;
+    const sf::Color backgroundColor = sf::Color::White;
+    const sf::Color flowfieldColor = sf::Color(0, 0, 0, 100);
+    const sf::Color particlesColor = sf::Color(0, 0, 0, showFlowfield ? 255 : 2);
 
     // create particle system
-    ParticleSystem particles = ParticleSystem(
-            particles_count,
-            particles_color,
-            1.f,
-            window_width,
-            window_height,
-            show_particles);
+    ParticleSystem particles = ParticleSystem(particlesCount, particlesColor, 1, windowWidth, windowHeight, showParticles);
 
     // create flow field
-    FlowField flowfield = FlowField(window_width, window_height, 10.f, flowfield_color, show_flowfield);
+    FlowField flowfield = FlowField(windowWidth, windowHeight, 10.f, flowfieldColor, showFlowfield);
 
     // create window
-    sf::RenderWindow window(sf::VideoMode(window_width, window_height), "Smoke");
+    sf::RenderWindow window(sf::VideoMode(windowWidth, windowHeight), "Smoke");
     window.setVerticalSyncEnabled(true);
-    window.clear(background_color);
+    window.clear(backgroundColor);
 
     // run the main loop
     while (window.isOpen())
@@ -53,20 +47,20 @@ int main()
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
         {
-            window.clear(background_color);
+            window.clear(backgroundColor);
         }
 
         // process
-        particles.follow_flowfield(flowfield.generate(), flowfield.get_scale());
+        particles.follow(flowfield.generate(), flowfield.getScale());
 
         // draw
-        if (show_flowfield)
+        if (showFlowfield)
         {
-            window.clear(background_color);
+            window.clear(backgroundColor);
             window.draw(flowfield);
         }
 
-        if (show_particles)
+        if (showParticles)
         {
             window.draw(particles);
         }

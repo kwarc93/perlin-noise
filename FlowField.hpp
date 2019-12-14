@@ -18,24 +18,29 @@ public:
     FlowField(unsigned int width, unsigned int height, float scale, sf::Color color, bool show);
 
     const std::vector<sf::Vector2f> & generate();
-    float get_scale();
+    float getScale() const;
 
 private:
 
-    bool show_;
-    float scale_;
-    unsigned int width_, cell_width_, height_, cell_height_;
+    bool show;
+    float scale;
+    unsigned int width, height;
+    unsigned int cellWidth, cellHeight;
 
-    std::vector<sf::Vector2f> flowfield_;
-    std::vector<sf::RectangleShape> vectors_;
+    std::vector<sf::Vector2f> flowfield;
+    std::vector<sf::RectangleShape> vectors;
 
-    PerlinNoise perlin_;
-    float x_off_, y_off_, z_off_;
+    struct dimensions
+    {
+        float x, y, z;
+    };
+
+    struct dimensions noiseDimensions;
+    PerlinNoise noiseGenerator;
 
     // methods
+    float calculateAngle(void);
     virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 };
-
-
 
 #endif /* FLOWFIELD_HPP_ */

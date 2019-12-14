@@ -12,46 +12,55 @@
 
 #include "ParticleSystem.hpp"
 
-ParticleSystem::ParticleSystem(unsigned int count, sf::Color color, float max_velocity,
-                               unsigned int field_width, unsigned int field_height, bool show)
+namespace
 {
-    field_width_ = field_width;
-    field_height_ = field_height;
-    max_velocity_ = max_velocity;
-    show_ = show;
+    float rnd(void) { return float(std::rand()) / RAND_MAX; }
+}
+
+ParticleSystem::ParticleSystem(unsigned int count, sf::Color color, float maxVelocity,
+                               unsigned int fieldWidth, unsigned int fieldHeight, bool show)
+{
+    this->fieldWidth = fieldWidth;
+    this->fieldHeight = fieldHeight;
+    this->maxVelocity = maxVelocity;
+    this->show = show;
 
     // create particles vector with random position & velocity
-    particles_.reserve(count);
+    this->particles.reserve(count);
 
     for (unsigned int i = 0; i < count; i++)
     {
-        sf::Vector2f random_velocity = sf::Vector2f(max_velocity_ * (float(std::rand()) / RAND_MAX),
-                                                    max_velocity_ * (float(std::rand()) / RAND_MAX));
-        sf::Vector2f random_position = sf::Vector2f(std::rand() % field_width, std::rand() % field_height);
+        sf::Vector2f randomVelocity = sf::Vector2f(this->maxVelocity * rnd(),
+                                                   this->maxVelocity * rnd());
+        sf::Vector2f randomPosition = sf::Vector2f(std::rand() % fieldWidth, std::rand() % fieldHeight);
 
-        particles_.push_back(Particle(random_position, random_velocity, color));
+        this->particles.push_back(Particle(randomPosition, randomVelocity, color));
     }
 }
 
-void ParticleSystem::follow_flowfield(const std::vector<sf::Vector2f> &flowfield, float ff_scale)
+void ParticleSystem::follow(const std::vector<sf::Vector2f> &flowfield, float flowfieldScale)
 {
-    for (auto &p : particles_)
+    for (auto &p : this->particles)
     {
-        unsigned int x = p.position.x / ff_scale;
-        unsigned int y = p.position.y / ff_scale;
-        unsigned int index = x * field_height_ / ff_scale + y;
+        unsigned int x = p.position.x / flowfieldScale;
+        unsigned int y = p.position.y / flowfieldScale;
+        unsigned int index = x * this->fieldHeight / flowfieldScale + y;
 
-        sf::Vector2f force = flowfield[index] * max_velocity_;
-        sf::Vector2f max_force = sf::Vector2f(1.f, 1.f) * 0.008f;
-        sf::Vector2f max_velocity = sf::Vector2f(max_velocity_, max_velocity_);
+        sf::Vector2f force = flowfield[index] * this->maxVelocity;
+        sf::Vector2f max_force = sf::Vector2f(1, 1) * (rnd() * 0.004f + 0.006f);
+        sf::Vector2f max_velocity = sf::Vector2f(this->maxVelocity, this->maxVelocity);
 
         force -= p.velocity;
         limit(force, max_force);
+
         p.acceleration = force;
+
         p.velocity += p.acceleration;
         limit(p.velocity, max_velocity);
+
         p.position += p.velocity;
-        loop_in_field(p);
+
+        loopInField(p);
     }
 }
 
@@ -59,27 +68,27 @@ void ParticleSystem::follow_flowfield(const std::vector<sf::Vector2f> &flowfield
 
 void ParticleSystem::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
-    if (show_)
+    if (show)
     {
         states.transform *= getTransform();
         states.texture = NULL;
 
-        for (auto &p : particles_)
+        for (auto &p : this->particles)
             target.draw(&p, 1, p.type, states);
     }
 }
 
-void ParticleSystem::loop_in_field(Particle &p)
+void ParticleSystem::loopInField(Particle &p)
 {
-    if (p.position.x > field_width_)
+    if (p.position.x > this->fieldWidth)
         p.position.x = 0.f;
     else if (p.position.x < 0.f)
-        p.position.x = field_width_;
+        p.position.x = this->fieldWidth;
 
-    if (p.position.y > field_height_)
+    if (p.position.y > this->fieldHeight)
         p.position.y = 0.f;
     else if (p.position.y < 0.f)
-        p.position.y = field_height_;
+        p.position.y = this->fieldHeight;
 }
 
 void ParticleSystem::limit(sf::Vector2f &vector, const sf::Vector2f &limit)
