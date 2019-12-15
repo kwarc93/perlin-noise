@@ -1,8 +1,8 @@
 # perlin-noise
 2D vector field driven by perlin noise.
 
-## Requirements
+## requirements
 - SFML 2.0 library
 
-# example
+### example
 ![result](/result.png)
