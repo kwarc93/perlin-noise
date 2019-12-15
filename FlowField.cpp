@@ -18,10 +18,10 @@ FlowField::FlowField(unsigned int width, unsigned int height, float scale, sf::C
     this->cellHeight = floor(height / this->height);
     this->scale = scale;
     this->show = show;
-    this->noiseDimensions.x = this->noiseDimensions.y = this->noiseDimensions.z = 0;
 
     // create perlin noise object with seed
     this->noiseGenerator = PerlinNoise(time(0));
+    this->noiseDimensions.x = this->noiseDimensions.y = this->noiseDimensions.z = 0;
 
     // create flowfields cells matrix
     this->flowfield.reserve(this->width * this->height);
